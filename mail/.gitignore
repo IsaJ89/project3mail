@@ -1,5 +1,8 @@
 # Byte-compiled / optimized / DLL files
 *$py.class
+__pycache__/
+*.py[cod]
+
 
 # Ignore macOS system files
 .DS_Store
