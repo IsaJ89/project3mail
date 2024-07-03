@@ -3,12 +3,11 @@
 __pycache__/
 *.py[cod]
 
-
 # Ignore macOS system files
 .DS_Store
 
 # Ignore database files
 db.sqlite3
 
-#Ignore temporary text file
+# Ignore temporary text file
 temp.txt
