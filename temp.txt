@@ -1,0 +1,11 @@
+Initial workflow
+    Create a repo online
+    Clone it inside a folder named ProjectX
+    Download the distribution code inside ProjectX
+    Run Migrations
+    Commit changes
+    Push commit to GitHub using git push
+
+
+__pycache__/
+*.py[cod]
