@@ -52,8 +52,8 @@ function compose_email() {
       // Log message
       console.log(`Message: ${result.message}`)
 
-      // Load inbox
-      load_mailbox('inbox')
+      // Load sent mailbox
+      load_mailbox('sent')
     })
   }
 }
@@ -65,4 +65,40 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  // fetch all mails in the mailbox
+  fetch(`/emails/${mailbox}`)
+  .then(response => response.json())
+  .then(result => {
+    console.log(result);
+    result.forEach( obj => {
+      const emailDiv = document.createElement('div');
+      const divSender = document.createElement('div');
+      const divSubject = document.createElement('div');
+      const divTime = document.createElement('div');
+      
+      divSender.innerHTML = obj['sender'];
+      divSubject.innerHTML = obj['subject'];
+      divTime.innerHTML = obj['timestamp'];
+
+      emailDiv.classList.add('row');
+      
+      divSender.classList.add('col-3'); 
+      divSubject.classList.add('col-6'); 
+      divTime.classList.add('col-3');
+      
+      divSender.style.fontWeight = "bold"
+
+      if(obj['read'] == false) {
+        emailDiv.style.background = "#F2F2F2";
+      }
+      else{
+        emailDiv.style.background = "#FFFFFF"; 
+      }
+      
+
+      emailDiv.append(divSender,divSubject,divTime);
+      document.querySelector('#emails-view').append(emailDiv);
+    })
+  });
 }
