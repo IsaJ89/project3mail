@@ -1,12 +1,12 @@
-textarea {
-    min-height: 400px;
-    min-width: 400px;
+#compose-body {
+    min-height: 300px;
 }
 
 .row{
     border: 2px solid black;
 }
-.btn-outline-dark {
-    margin-right: 40px; /* Adjust as necessary */
-    white-space: nowrap; /* Prevents button text from wrapping */
-  }
+
+#body{
+    min-height: 300px;
+}
+

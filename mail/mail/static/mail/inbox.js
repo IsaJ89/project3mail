@@ -23,7 +23,7 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 
   // Fetch submit button
-  const submitButton = document.querySelector('.btn.btn-primary');
+  const submitButton = document.querySelector('#submit');
   submitButton.onclick = function(event) {
     
     // prevent default form submission
@@ -186,6 +186,14 @@ function show_email(id) {
     document.querySelector('#timestamp').innerHTML = (`<b>Time:</b> ${email.timestamp}`);
     document.querySelector('#body').innerHTML = email.body;
   });
+
+  
+  // query the reply button and add an event listener to it
+  const replyButton = document.querySelector('#reply-button');
+  replyButton.onclick = function() {
+    reply_to_email(id);
+  }
+
 }
 
 function archive_email(id, innerHTML_value) {
@@ -215,5 +223,56 @@ function archive_email(id, innerHTML_value) {
   }
 };
 
+function reply_to_email(id) {
+  
+  // Show compose view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#view-email').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'block';
 
+  // Fetch email contents
+  fetch(`/emails/${id}`)
+  .then(response => response.json())
+  .then(email => {
+    // Pre-fill composition fields
+    document.querySelector('#compose-recipients').value = email.sender;
+    document.querySelector('#compose-subject').value = (`Re: ${email.subject}`);
+    document.querySelector('#compose-body').innerHTML = (`On ${email.timestamp}, ${email.sender} wrote: "${email.body}"`);
+  });
+
+  // Fetch submit button
+  const submitButton = document.querySelector('#submit')
+  submitButton.onclick = function(event) {
+
+    // Prevent default form submission
+    event.preventDefault();
+
+    // Extract email contents
+    const emailRecipients = document.querySelector('#compose-recipients').value;
+    const emailSubject = document.querySelector('#compose-subject').value;
+    const emailBody = document.querySelector('#compose-body').value;
+
+    // send POST request
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: emailRecipients,
+        subject: emailSubject,
+        body: emailBody
+      })
+    })
+    .then(response => {
+      // Log the status code
+      console.log(response.status)
+      return response.json()})
+
+    .then(result => {
+      // Log message
+      console.log(`Message: ${result.message}`)
+
+      // Load sent mailbox
+      load_mailbox('sent')
+    })
+  }
+}
 

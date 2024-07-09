@@ -27,7 +27,7 @@
                 <input class="form-control" id="compose-subject" placeholder="Subject">
             </div>
             <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
-            <input type="submit" class="btn btn-primary"/>
+            <input type="submit" id="submit" class="btn btn-primary"/>
         </form>
     </div>
     <div class="container" id="view-email" style="border: 3px solid blueviolet">
@@ -37,6 +37,9 @@
         <div id="timestamp"><b>Time</b></div>
         <hr>
         <div id="body">
+        </div>
+        <div>
+            <button id="reply-button" class="btn btn-primary">Reply</button>
         </div>
     </div>
 {% endblock %}
