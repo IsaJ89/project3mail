@@ -136,6 +136,7 @@ function show_email(id, mailbox){
     })
   })
   
+  
   // Fetch the contents of the email
   fetch(`/emails/${id}`)
   .then(response => response.json())
@@ -171,13 +172,16 @@ function show_email(id, mailbox){
 
 
   archiveButton.onclick = function() {
-
+    
     if(archiveButton.innerHTML == 'Archive') {
       fetch(`emails/${id}`,{
         method: 'PUT',
         body: JSON.stringify({
           archived: true
         })
+      })
+      .then( () => {
+        load_mailbox('inbox')
       })
     }
     else if(archiveButton.innerHTML == 'Unarchive') {
@@ -187,13 +191,11 @@ function show_email(id, mailbox){
           archived: false
         })
       })
+      .then( () => {
+        load_mailbox('inbox')
+      })
     }
-  
-   load_mailbox('inbox');
   };
-
-
-
 }
 
 
