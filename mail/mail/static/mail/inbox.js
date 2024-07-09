@@ -78,7 +78,9 @@ function load_mailbox(mailbox) {
       const divSender = document.createElement('div');
       const divSubject = document.createElement('div');
       const divTime = document.createElement('div');
-      const viewButton = document.createElement('div');
+      const divView = document.createElement('div');
+      const divArchive = document.createElement('div');
+      
 
       
       divSender.innerHTML = obj['sender'];
@@ -89,9 +91,11 @@ function load_mailbox(mailbox) {
       
       
       divSender.classList.add('col-2'); 
-      divSubject.classList.add('col-6'); 
+      divSubject.classList.add('col-5'); 
       divTime.classList.add('col-3');
-      viewButton.classList.add('col-1')
+      divArchive.classList.add('col-1');
+      divView.classList.add('col-1');
+      
       
       divSender.style.fontWeight = "bold"
 
@@ -105,24 +109,57 @@ function load_mailbox(mailbox) {
       const view = document.createElement('button');
       view.type = 'button';
       view.classList.add('btn','btn-outline-dark');
-      view.id = obj['id'];
+      view.value = obj['id'];
       view.innerHTML = 'View';
 
-      viewButton.append(view);
+      divView.append(view);
 
-      emailDiv.append(divSender,divSubject,divTime,viewButton);
+      const archiveButton = document.createElement('button');
+      archiveButton.type= 'button';
+      archiveButton.classList.add('btn', 'btn-outline-dark');
+      archiveButton.value = obj['id'];
+      archiveButton.setAttribute('data-archive','archive');
+
+      if(mailbox == 'inbox'){
+        console.log(`Mailbox is: ${mailbox}`);
+        archiveButton.innerHTML = 'Archive';
+        archiveButton.style.display = 'block';
+      }
+      else if(mailbox == 'archive') {
+        console.log(`Mailbox is: ${mailbox}`);
+        archiveButton.innerHTML = 'Unarchive';
+        archiveButton.style.display = 'block';
+      }
+      else{
+        archiveButton.style.display = 'none';
+      }
+
+      divArchive.append(archiveButton);
+      
+
+
+      emailDiv.append(divSender,divSubject,divTime,divArchive,divView);
       document.querySelector('#emails-view').append(emailDiv);
     });
+
    // Query and add event listener to the view buttons
    document.querySelectorAll('.btn-outline-dark').forEach( button => {
     button.onclick = function () {
-      show_email(button.id, mailbox);
+      show_email(button.value);
     }
    })
+
+   // Query and add event listener to the archive button
+    document.querySelectorAll('[data-archive]').forEach( button => {
+      button.onclick = function () {
+        archive_email(button.value, button.innerHTML);
+      }
+    })
+
   });
 }
 
-function show_email(id, mailbox){
+function show_email(id) {
   
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
@@ -149,53 +186,34 @@ function show_email(id, mailbox){
     document.querySelector('#timestamp').innerHTML = (`<b>Time:</b> ${email.timestamp}`);
     document.querySelector('#body').innerHTML = email.body;
   });
-
-
-  // get the archive/unarchive button
-  const archiveButton = document.querySelector('#archive-button');
-
-  
-
-  if(mailbox == 'inbox'){
-    console.log(`Mailbox is: ${mailbox}`);
-    archiveButton.innerHTML = 'Archive';
-    archiveButton.style.display = 'block';
-  }
-  else if(mailbox == 'archive') {
-    console.log(`Mailbox is: ${mailbox}`);
-    archiveButton.innerHTML = 'Unarchive';
-    archiveButton.style.display = 'block';
-  }
-  else{
-    archiveButton.style.display = 'none';
-  }
-
-
-  archiveButton.onclick = function() {
-    
-    if(archiveButton.innerHTML == 'Archive') {
-      fetch(`emails/${id}`,{
-        method: 'PUT',
-        body: JSON.stringify({
-          archived: true
-        })
-      })
-      .then( () => {
-        load_mailbox('inbox')
-      })
-    }
-    else if(archiveButton.innerHTML == 'Unarchive') {
-      fetch(`/emails/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          archived: false
-        })
-      })
-      .then( () => {
-        load_mailbox('inbox')
-      })
-    }
-  };
 }
+
+function archive_email(id, innerHTML_value) {
+  console.log(id);
+  console.log(innerHTML_value);
+  if(innerHTML_value == 'Archive') {
+    fetch(`emails/${id}`,{
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: true
+      })
+    })
+    .then( () => {
+      load_mailbox('inbox')
+    })
+  }
+  else if(innerHTML_value == 'Unarchive') {
+    fetch(`/emails/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: false
+      })
+    })
+    .then( () => {
+      load_mailbox('inbox')
+    })
+  }
+};
+
 
 
