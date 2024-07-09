@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
-
+  
   // By default, load the inbox
   load_mailbox('inbox');
 });
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#view-email').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
   // Clear out composition fields
@@ -62,6 +63,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#view-email').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -70,12 +72,13 @@ function load_mailbox(mailbox) {
   fetch(`/emails/${mailbox}`)
   .then(response => response.json())
   .then(result => {
-    console.log(result);
     result.forEach( obj => {
       const emailDiv = document.createElement('div');
       const divSender = document.createElement('div');
       const divSubject = document.createElement('div');
       const divTime = document.createElement('div');
+      const viewButton = document.createElement('div');
+
       
       divSender.innerHTML = obj['sender'];
       divSubject.innerHTML = obj['subject'];
@@ -83,9 +86,11 @@ function load_mailbox(mailbox) {
 
       emailDiv.classList.add('row');
       
-      divSender.classList.add('col-3'); 
+      
+      divSender.classList.add('col-2'); 
       divSubject.classList.add('col-6'); 
       divTime.classList.add('col-3');
+      viewButton.classList.add('col-1')
       
       divSender.style.fontWeight = "bold"
 
@@ -96,9 +101,43 @@ function load_mailbox(mailbox) {
         emailDiv.style.background = "#FFFFFF"; 
       }
       
+      const view = document.createElement('button');
+      view.type = 'button';
+      view.classList.add('btn','btn-outline-dark');
+      view.id = obj['id'];
+      view.innerHTML = 'View';
 
-      emailDiv.append(divSender,divSubject,divTime);
+      viewButton.append(view);
+
+      emailDiv.append(divSender,divSubject,divTime,viewButton);
       document.querySelector('#emails-view').append(emailDiv);
-    })
+    });
+   // Query and add event listener to the view buttons
+   document.querySelectorAll('.btn-outline-dark').forEach( button => {
+    button.onclick = function () {
+      show_email(button.id);
+    }
+   })
   });
 }
+
+function show_email(id){
+
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#view-email').style.display = 'block'
+  
+  fetch(`/emails/${id}`)
+  .then(response => response.json())
+  .then(email => {
+    //Print email
+    console.log(email);
+    document.querySelector('#sender').innerHTML = (`<b>From:</b> ${email.sender}`);
+    document.querySelector('#recipients').innerHTML = (`<b>To:</b> ${email.recipients}`);
+    document.querySelector('#subject').innerHTML = (`<b>Subject:</b> ${email.subject}`);
+    document.querySelector('#timestamp').innerHTML = (`<b>Time:</b> ${email.timestamp}`);
+    document.querySelector('#body').innerHTML = email.body;
+  })
+}
+
+
