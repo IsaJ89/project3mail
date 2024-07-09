@@ -60,6 +60,7 @@ function compose_email() {
 }
 
 function load_mailbox(mailbox) {
+  console.log(`The mailbox loaded is ${mailbox}`);
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
@@ -147,6 +148,52 @@ function show_email(id, mailbox){
     document.querySelector('#timestamp').innerHTML = (`<b>Time:</b> ${email.timestamp}`);
     document.querySelector('#body').innerHTML = email.body;
   });
+
+
+  // get the archive/unarchive button
+  const archiveButton = document.querySelector('#archive-button');
+
+  
+
+  if(mailbox == 'inbox'){
+    console.log(`Mailbox is: ${mailbox}`);
+    archiveButton.innerHTML = 'Archive';
+    archiveButton.style.display = 'block';
+  }
+  else if(mailbox == 'archive') {
+    console.log(`Mailbox is: ${mailbox}`);
+    archiveButton.innerHTML = 'Unarchive';
+    archiveButton.style.display = 'block';
+  }
+  else{
+    archiveButton.style.display = 'none';
+  }
+
+
+  archiveButton.onclick = function() {
+
+    if(archiveButton.innerHTML == 'Archive') {
+      fetch(`emails/${id}`,{
+        method: 'PUT',
+        body: JSON.stringify({
+          archived: true
+        })
+      })
+    }
+    else if(archiveButton.innerHTML == 'Unarchive') {
+      fetch(`/emails/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          archived: false
+        })
+      })
+    }
+  
+   load_mailbox('inbox');
+  };
+
+
+
 }
 
 
