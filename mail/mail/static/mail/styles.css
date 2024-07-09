@@ -6,3 +6,7 @@ textarea {
 .row{
     border: 2px solid black;
 }
+
+#archive-button {
+    margin-top: 10px;
+}

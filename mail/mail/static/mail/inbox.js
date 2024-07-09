@@ -115,18 +115,27 @@ function load_mailbox(mailbox) {
    // Query and add event listener to the view buttons
    document.querySelectorAll('.btn-outline-dark').forEach( button => {
     button.onclick = function () {
-      show_email(button.id);
+      show_email(button.id, mailbox);
     }
    })
   });
 }
 
-function show_email(id){
-
+function show_email(id, mailbox){
+  
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
   document.querySelector('#view-email').style.display = 'block'
+
+  // Mark the email as read
+  fetch(`emails/${id}`,{
+    method: 'PUT',
+    body: JSON.stringify({
+      read: true
+    })
+  })
   
+  // Fetch the contents of the email
   fetch(`/emails/${id}`)
   .then(response => response.json())
   .then(email => {
@@ -137,7 +146,7 @@ function show_email(id){
     document.querySelector('#subject').innerHTML = (`<b>Subject:</b> ${email.subject}`);
     document.querySelector('#timestamp').innerHTML = (`<b>Time:</b> ${email.timestamp}`);
     document.querySelector('#body').innerHTML = email.body;
-  })
+  });
 }
 
 
