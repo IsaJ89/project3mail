@@ -224,6 +224,8 @@ function archive_email(id, innerHTML_value) {
 };
 
 function reply_to_email(id) {
+
+  const pattern = /^Re:/;
   
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
@@ -236,7 +238,14 @@ function reply_to_email(id) {
   .then(email => {
     // Pre-fill composition fields
     document.querySelector('#compose-recipients').value = email.sender;
-    document.querySelector('#compose-subject').value = (`Re: ${email.subject}`);
+    
+    // check if subject already begins with Re: 
+    if(pattern.test(email.subject)) {
+      document.querySelector('#compose-subject').value = (email.subject);
+    }
+    else{
+      document.querySelector('#compose-subject').value = (`Re: ${email.subject}`);
+    }
     document.querySelector('#compose-body').innerHTML = (`On ${email.timestamp}, ${email.sender} wrote: "${email.body}"`);
   });
 
